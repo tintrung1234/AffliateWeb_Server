@@ -21,11 +21,13 @@ const {
   getPostsByTag,
   getPostsByCategory,
   getPostDetail,
-  getTop1Blog,
+  getTop2Blog,
   getPostsNewest,
   createPost,
   getPostsByUser,
+  get2TopDiscount,
   updatePost,
+  deletePost,
 } = require("../controllers/postController");
 
 // Lấy tất cả bài viết
@@ -43,11 +45,13 @@ router.get("/category/:category", getPostsByCategory);
 // Lấy bài viết chi tiết
 router.get("/detail/:id", getPostDetail);
 
-// Lấy bài viết top 1
-router.get("/topblog", getTop1Blog);
+// Lấy bài viết top 2
+router.get("/topblog", getTop2Blog);
 
 // Lấy bài viết mới nhất
 router.get("/newest", getPostsNewest);
+
+router.get("/2TopDiscount", get2TopDiscount);
 
 // Tạo bài viết
 router.post("/create", upload.single("image"), createPost);
@@ -55,10 +59,12 @@ router.post("/create", upload.single("image"), createPost);
 // Lấy bài theo user
 router.get("/user/:uid", getPostsByUser);
 
+router.delete("/delete/:id", deletePost);
+
 // Cập nhật bài viết theo user
 router.put(
   "/update/:id",
-  firebaseAuth,
+  // firebaseAuth,
   upload.single("image"),
   (err, req, res, next) => {
     if (err instanceof multer.MulterError) {

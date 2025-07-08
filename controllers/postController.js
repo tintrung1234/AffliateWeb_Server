@@ -69,9 +69,18 @@ const getPostDetail = async (req, res) => {
   }
 };
 
-const getTop1Blog = async (req, res) => {
+const getTop2Blog = async (req, res) => {
   try {
-    const posts = await Post.findOne().sort({ createdAt: -1 }); // Sắp xếp mới nhất trước
+    const posts = await Post.find().sort({ createdAt: -1 }).limit(2);
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi khi lấy bài viết", error });
+  }
+};
+
+const get2TopDiscount = async (req, res) => {
+  try {
+    const posts = await Post.find().sort({ discount: -1 }).limit(2);
     res.json(posts);
   } catch (error) {
     res.status(500).json({ message: "Lỗi khi lấy bài viết", error });
@@ -94,7 +103,6 @@ const getPostsNewest = async (req, res) => {
 
 const createPost = async (req, res) => {
   try {
-    console.log("Creating post with body:", req.body);
     const { uid, title, lowPrice, highPrice, description, category, details } = req.body;
 
     // Kiểm tra các trường bắt buộc
@@ -105,13 +113,14 @@ const createPost = async (req, res) => {
     }
 
     // Upload image nếu có
-    let imageUrl = ""; 
+    let imageUrl = "";
+    let imagePublicId = "";
     if (req.file) {
-      console.log("Image uploaded to Cloudinary:", imageUrl);
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "posts",
       });
       imageUrl = result.secure_url;
+      imagePublicId = result.public_id;
 
 
       // Xóa file tạm
@@ -129,6 +138,7 @@ const createPost = async (req, res) => {
       category,
       details,
       imageUrl,
+      imagePublicId,
       createdAt: new Date(),
     });
 
@@ -137,13 +147,13 @@ const createPost = async (req, res) => {
     res
       .status(201)
       .json({ message: "Post created successfully", post: savedPost });
-      console.log("Post created successfully:", savedPost);
+    console.log("Post created successfully:", savedPost);
   } catch (err) {
     console.error(err);
     res
       .status(500)
       .json({ message: "Error creating post", error: err.message });
-      console.error("Error creating post:", err);
+    console.error("Error creating post:", err);
   }
 };
 
@@ -168,9 +178,14 @@ const updatePost = async (req, res) => {
     const post = await Post.findById(id);
     if (!post) return res.status(404).json({ message: "Post not found" });
 
-    // Kiểm tra quyền sở hữu
-    if (post.uid !== req.user.uid) {
-      return res.status(403).json({ message: "Unauthorized" });
+    // // Kiểm tra quyền sở hữu
+    // if (post.uid !== req.user.uid) {
+    //   return res.status(403).json({ message: "Unauthorized" });
+    // }
+
+    //Xoa anh 
+    if (post.imagePublicId) {
+      await cloudinary.uploader.destroy(post.imagePublicId);
     }
 
     // Upload ảnh mới nếu có
@@ -179,6 +194,7 @@ const updatePost = async (req, res) => {
         folder: "posts",
       });
       post.imageUrl = result.secure_url;
+      post.imagePublicId = result.public_id;
       // Xoá file tạm
       fs.unlinkSync(req.file.path);
     }
@@ -207,15 +223,36 @@ const updatePost = async (req, res) => {
   }
 };
 
+const deletePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const post = await Post.findById(id);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    // ✅ Delete image from Cloudinary
+    if (post.imagePublicId) {
+      await cloudinary.uploader.destroy(post.imagePublicId);
+    }
+
+    await Post.findByIdAndDelete(id);
+    res.json({ message: "Post deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting post", error: err.message });
+  }
+};
+
+
 module.exports = {
   getAllPosts,
   searchPosts,
   getPostsByTag,
   getPostsByCategory,
   getPostDetail,
-  getTop1Blog,
+  getTop2Blog,
   getPostsNewest,
   createPost,
   getPostsByUser,
+  get2TopDiscount,
   updatePost,
+  deletePost
 };

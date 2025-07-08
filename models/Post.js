@@ -11,6 +11,7 @@ const postSchema = new mongoose.Schema({
   imageUrl: { type: String, default: "" },
   tags: [{ type: String }],
   createdAt: { type: Date, default: Date.now },
+  imagePublicId: { type: String},
 });
 
 // Optional: enable full-text search
