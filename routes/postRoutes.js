@@ -18,16 +18,12 @@ const firebaseAuth = require("../middlewares/firebaseAuth");
 const {
   getAllPosts,
   searchPosts,
-  getPostsByTag,
   getPostsByCategory,
   getPostDetail,
-  getTop2Blog,
   getPostsNewest,
   createPost,
-  getPostsByUser,
-  get2TopDiscount,
   updatePost,
-  deletePost,
+  deletePost
 } = require("../controllers/postController");
 
 // Lấy tất cả bài viết
@@ -36,28 +32,17 @@ router.get("/", getAllPosts);
 // Tìm kiếm bài viết theo query text
 router.get("/search", searchPosts);
 
-// Lấy bài viết theo tag
-router.get("/tag/:tag", getPostsByTag);
-
 // Lấy bài viết theo category
 router.get("/category/:category", getPostsByCategory);
 
 // Lấy bài viết chi tiết
 router.get("/detail/:id", getPostDetail);
 
-// Lấy bài viết top 2
-router.get("/topblog", getTop2Blog);
-
 // Lấy bài viết mới nhất
 router.get("/newest", getPostsNewest);
 
-router.get("/2TopDiscount", get2TopDiscount);
-
 // Tạo bài viết
 router.post("/create", upload.single("image"), createPost);
-
-// Lấy bài theo user
-router.get("/user/:uid", getPostsByUser);
 
 router.delete("/delete/:id", deletePost);
 

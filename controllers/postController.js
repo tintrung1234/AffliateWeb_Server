@@ -34,16 +34,6 @@ const searchPosts = async (req, res) => {
   }
 };
 
-const getPostsByTag = async (req, res) => {
-  const { tag } = req.params;
-  try {
-    const posts = await Post.find({ tags: tag }).limit(10);
-    res.json(posts);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching posts by tag", error });
-  }
-};
-
 const getPostsByCategory = async (req, res) => {
   const { category } = req.params;
   try {
@@ -69,24 +59,6 @@ const getPostDetail = async (req, res) => {
   }
 };
 
-const getTop2Blog = async (req, res) => {
-  try {
-    const posts = await Post.find().sort({ createdAt: -1 }).limit(2);
-    res.json(posts);
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi khi lấy bài viết", error });
-  }
-};
-
-const get2TopDiscount = async (req, res) => {
-  try {
-    const posts = await Post.find().sort({ discount: -1 }).limit(2);
-    res.json(posts);
-  } catch (error) {
-    res.status(500).json({ message: "Lỗi khi lấy bài viết", error });
-  }
-};
-
 // Lấy 5 bài viết mới nhất
 const getPostsNewest = async (req, res) => {
   try {
@@ -103,7 +75,7 @@ const getPostsNewest = async (req, res) => {
 
 const createPost = async (req, res) => {
   try {
-    const { uid, title, lowPrice, highPrice, description, category, details } = req.body;
+    const { uid, title, description, views, category, content } = req.body;
 
     // Kiểm tra các trường bắt buộc
     if (!title || !description || !category) {
@@ -132,11 +104,10 @@ const createPost = async (req, res) => {
     const newPost = new Post({
       uid,
       title,
-      lowPrice,
-      highPrice,
       description,
+      views: typeof views === "number" ? views : 0,
       category,
-      details,
+      content,
       imageUrl,
       imagePublicId,
       createdAt: new Date(),
@@ -157,23 +128,10 @@ const createPost = async (req, res) => {
   }
 };
 
-// Get User Posts Endpoint
-const getPostsByUser = async (req, res) => {
-  try {
-    const posts = await Post.find({ uid: req.params.uid }).sort({
-      createdAt: -1,
-    });
-    res.json(posts);
-  } catch (error) {
-    console.error("Error fetching posts:", error);
-    res.status(500).json({ error: "Server error while fetching posts" });
-  }
-};
-
 const updatePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const { category, title, description } = req.body;
+    const { category, title, description, views, content } = req.body;
 
     const post = await Post.findById(id);
     if (!post) return res.status(404).json({ message: "Post not found" });
@@ -203,15 +161,8 @@ const updatePost = async (req, res) => {
     post.category = category || post.category;
     post.title = title || post.title;
     post.description = description || post.description;
-
-    // Cập nhật tags từ FormData
-    if (req.body.tags) {
-      // Nếu tags là chuỗi (do FormData có thể gửi từng tag riêng lẻ), chuyển thành mảng
-      const tagsArray = Array.isArray(req.body.tags)
-        ? req.body.tags
-        : req.body.tags.split(",");
-      post.tags = tagsArray.length > 0 ? tagsArray : post.tags;
-    }
+    post.content = content || post.content;
+    product.views = views !== undefined ? Number(views) : product.views;
 
     await post.save();
 
@@ -245,14 +196,10 @@ const deletePost = async (req, res) => {
 module.exports = {
   getAllPosts,
   searchPosts,
-  getPostsByTag,
   getPostsByCategory,
   getPostDetail,
-  getTop2Blog,
   getPostsNewest,
   createPost,
-  getPostsByUser,
-  get2TopDiscount,
   updatePost,
   deletePost
 };
