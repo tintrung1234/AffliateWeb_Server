@@ -14,7 +14,7 @@ const upload = multer({
     cb(null, true);
   },
 });
-const firebaseAuth = require("../middlewares/firebaseAuth");
+
 const {
   getAllPosts,
   searchPosts,
