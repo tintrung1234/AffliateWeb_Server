@@ -162,7 +162,7 @@ const updatePost = async (req, res) => {
     post.title = title || post.title;
     post.description = description || post.description;
     post.content = content || post.content;
-    product.views = views !== undefined ? Number(views) : product.views;
+    post.views = views !== undefined ? Number(views) : post.views;
 
     await post.save();
 

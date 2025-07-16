@@ -72,7 +72,7 @@ exports.login = async (req, res) => {
 };
 
 exports.getUser = async (req, res) => {
-    try {
+  try {
     const user = await User.findById(req.user.id).select("-password");
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -82,3 +82,46 @@ exports.getUser = async (req, res) => {
   }
 };
 
+exports.getAllUsers = async (req, res) => {
+  try {
+    // Nếu bạn chỉ muốn cho admin xem:
+    if (req.user.role !== "Admin") {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const users = await User.find().select("-password");
+    res.json(users); // Trả về toàn bộ user (trừ password)
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.updateUser = async (req, res) => {
+  try {
+    const { email, username, role } = req.body;
+
+    const userId = req.user.id; // req.user được gắn từ middleware khi decode token
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        email,
+        username,
+        role,
+      },
+      { new: true, runValidators: true } // trả về bản ghi sau cập nhật
+    ).select("-password"); // không trả về password
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      message: "User updated successfully",
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error("Update user error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
