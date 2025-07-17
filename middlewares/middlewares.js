@@ -9,6 +9,9 @@ const authMiddleware = (req, res, next) => {
   const token = authHeader.split(" ")[1];
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (decoded.role !== "Admin") {
+      return res.status(403).json({ message: "Access forbidden: Admins only" });
+    }
     req.user = decoded; // chứa { id, role }
     next();
   } catch (err) {
