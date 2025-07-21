@@ -7,7 +7,7 @@ const getAllProducts = async (req, res) => {
         const products = await Product.find().sort({ createdAt: -1 });
         res.json(products);
     } catch (error) {
-        res.status(500).json({ message: "Lỗi khi lấy bài viết", error });
+        res.status(500).json({ message: "Lỗi khi lấy sản phẩm", error });
     }
 };
 
@@ -179,11 +179,11 @@ const getProductDetail = async (req, res) => {
     try {
         const product = await Product.findById(id);
         if (!product) {
-            return res.status(404).json({ message: "Bài viết không tồn tại" });
+            return res.status(404).json({ message: "Sản phẩm không tồn tại" });
         }
         res.json(product);
     } catch (error) {
-        res.status(500).json({ message: "Lỗi khi lấy chi tiết bài viết", error });
+        res.status(500).json({ message: "Lỗi khi lấy chi tiết sản phẩm", error });
     }
 };
 
@@ -192,7 +192,7 @@ const get2TopDiscount = async (req, res) => {
         const products = await Product.find().sort({ discount: -1 }).limit(2);
         res.json(products);
     } catch (error) {
-        res.status(500).json({ message: "Lỗi khi lấy bài viết", error });
+        res.status(500).json({ message: "Lỗi khi lấy sản phẩm", error });
     }
 };
 
