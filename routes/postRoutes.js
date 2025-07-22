@@ -23,7 +23,8 @@ const {
   getPostsNewest,
   createPost,
   updatePost,
-  deletePost
+  deletePost,
+  getTop1Blog
 } = require("../controllers/postController");
 
 // Lấy tất cả bài viết
@@ -45,6 +46,9 @@ router.get("/newest", getPostsNewest);
 router.post("/create", upload.single("image"), createPost);
 
 router.delete("/delete/:id", deletePost);
+
+// Lấy bài viết hàng đầu
+router.get("/topblog", getTop1Blog);
 
 // Cập nhật bài viết theo user
 router.put(

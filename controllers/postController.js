@@ -192,6 +192,14 @@ const deletePost = async (req, res) => {
   }
 };
 
+const getTop1Blog = async (req, res) => {
+  try {
+    const posts = await Post.findOne().sort({ createdAt: -1 }); // Sắp xếp mới nhất trước
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi khi lấy bài viết", error });
+  }
+};
 
 module.exports = {
   getAllPosts,
@@ -201,5 +209,6 @@ module.exports = {
   getPostsNewest,
   createPost,
   updatePost,
-  deletePost
+  deletePost,
+  getTop1Blog
 };

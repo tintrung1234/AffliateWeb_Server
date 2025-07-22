@@ -196,6 +196,15 @@ const get2TopDiscount = async (req, res) => {
     }
 };
 
+const getDiscountProducts = async (req, res) => {
+    try {
+        const products = await Product.find().sort({ discount: -1 });
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi khi lấy sản phẩm", error });
+    }
+};
+
 module.exports = {
     getAllProducts,
     searchProducts,
@@ -204,5 +213,6 @@ module.exports = {
     createProduct,
     get2TopDiscount,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getDiscountProducts
 };

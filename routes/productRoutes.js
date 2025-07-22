@@ -22,7 +22,8 @@ const {
     createProduct,
     get2TopDiscount,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    getDiscountProducts
 } = require("../controllers/productController");
 
 // Lấy tất cả bài viết
@@ -42,6 +43,8 @@ router.get("/category/:category", getProductsByCategory);
 router.post("/create", upload.single("image"), createProduct);
 
 router.delete("/delete/:id", deleteProduct);
+
+router.get("/getdiscountproducts", getDiscountProducts);
 
 // Cập nhật bài viết theo user
 router.put(
