@@ -14,20 +14,35 @@ const getAllPosts = async (req, res) => {
 const searchPosts = async (req, res) => {
   const query = req.query.q || "";
   const category = req.query.category || "";
-  const tag = req.query.tag || "";
-  try {
-    const posts = await Post.find({
-      $and: [
-        {
-          $or: [
-            { title: { $regex: query, $options: "i" } },
-            { description: { $regex: query, $options: "i" } },
-          ],
-        },
-        category ? { category: category } : {},
-        tag ? { tags: tag } : {},
+  const ids = req.query.ids ? req.query.ids.split(",") : null;
+
+  let filters = [];
+
+  // Search by text
+  if (query) {
+    filters.push({
+      $or: [
+        { title: { $regex: query, $options: "i" } },
+        { description: { $regex: query, $options: "i" } },
       ],
-    }).limit(10);
+    });
+  }
+
+  // Search by category
+  if (category) {
+    filters.push({ category });
+  }
+
+  // Search by product IDs
+  if (ids && ids.length > 0) {
+    filters.push({ _id: { $in: ids } });
+  }
+
+  try {
+    const posts = await Post.find(
+      filters.length > 0 ? { $and: filters } : {}
+    ).limit(10);
+
     res.json(posts);
   } catch (error) {
     res.status(500).json({ message: "Error fetching posts", error });

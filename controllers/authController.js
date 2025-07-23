@@ -5,7 +5,6 @@ const User = require("../models/User");
 
 exports.register = async (req, res) => {
   try {
-    console.log(req.body)
     const { email, username, password, photoUrl, publicId } = req.body;
 
     const existingUser = await User.findOne({ email });
@@ -63,6 +62,8 @@ exports.login = async (req, res) => {
         username: user.username,
         photoUrl: user.photoUrl,
         role: user.role,
+        favoritesProduct: user.favoritesProduct,
+        favoritesPost: user.favoritesPost,
       },
     });
   } catch (err) {
@@ -156,5 +157,65 @@ exports.deleteUser = async (req, res) => {
     res.json({ message: "User deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: "Error deleting User", error: err.message });
+  }
+};
+
+exports.toggleProductFavorite = async (req, res) => {
+  const userId = req.user.id;
+  const { productId } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const index = user.favoritesProduct.indexOf(productId);
+    let action;
+
+    if (index === -1) {
+      // Chưa có => thêm
+      user.favoritesProduct.push(productId);
+      action = 'added';
+    } else {
+      // Đã có => xóa
+      user.favoritesProduct.splice(index, 1);
+      action = 'removed';
+    }
+
+    await user.save();
+    res.json({ message: `Product ${action} to favorites`, favoritesProduct: user.favoritesProduct });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.togglePostFavorite = async (req, res) => {
+  const userId = req.user.id;
+  const { postId } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const index = user.favoritesPost.indexOf(postId);
+    let action;
+
+    if (index === -1) {
+      // Chưa có => thêm
+      user.favoritesPost.push(postId);
+      action = 'added';
+    } else {
+      // Đã có => xóa
+      user.favoritesPost.splice(index, 1);
+      action = 'removed';
+    }
+
+    await user.save();
+    res.json({ message: `Post ${action} to favorites`, favoritesPost: user.favoritesPost });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
 };

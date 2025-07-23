@@ -14,20 +14,38 @@ const getAllProducts = async (req, res) => {
 const searchProducts = async (req, res) => {
     const query = req.query.q || "";
     const category = req.query.category || "";
-    try {
-        const products = await Product.find({
-            $and: [
-                {
-                    $or: [
-                        { title: { $regex: query, $options: "i" } },
-                        { description: { $regex: query, $options: "i" } },
-                    ],
-                },
-                category ? { category: category } : {},
+    const ids = req.query.ids ? req.query.ids.split(",") : null;
+
+    let filters = [];
+
+    // Search by text
+    if (query) {
+        filters.push({
+            $or: [
+                { title: { $regex: query, $options: "i" } },
+                { description: { $regex: query, $options: "i" } },
             ],
-        }).limit(10);
+        });
+    }
+
+    // Search by category
+    if (category) {
+        filters.push({ category });
+    }
+
+    // Search by product IDs
+    if (ids && ids.length > 0) {
+        filters.push({ _id: { $in: ids } });
+    }
+
+    try {
+        const products = await Product.find(
+            filters.length > 0 ? { $and: filters } : {}
+        ).limit(10);
+
         res.json(products);
     } catch (error) {
+        console.error("Error fetching products:", error);
         res.status(500).json({ message: "Error fetching products", error });
     }
 };
