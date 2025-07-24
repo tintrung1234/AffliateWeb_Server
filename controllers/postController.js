@@ -146,7 +146,7 @@ const createPost = async (req, res) => {
 const updatePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const { category, title, description, views, content } = req.body;
+    const { category, title, description, views, content, metaTitle, metaDescription, metaKeywords } = req.body;
 
     const post = await Post.findById(id);
     if (!post) return res.status(404).json({ message: "Post not found" });
@@ -178,6 +178,9 @@ const updatePost = async (req, res) => {
     post.description = description || post.description;
     post.content = content || post.content;
     post.views = views !== undefined ? Number(views) : post.views;
+    post.metaTitle = metaTitle !== undefined ? String(metaTitle) : post.metaTitle;
+    post.metaDescription = metaDescription !== undefined ? String(metaDescription) : post.metaDescription;
+    post.metaKeywords = metaKeywords !== undefined ? String(metaKeywords) : post.metaKeywords;
 
     await post.save();
 

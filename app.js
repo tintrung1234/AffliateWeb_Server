@@ -7,6 +7,7 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const productRoutes = require("./routes/productRoutes");
 const bannerRoutes = require("./routes/bannerRoutes");
 const informationRoutes = require("./routes/informationRoutes");
+const assetsRoutes = require("./routes/assetsRoutes")
 
 const app = express();
 app.use(cors());
@@ -18,6 +19,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/banner", bannerRoutes);
+app.use("/api/assets", assetsRoutes);
 app.use("/api/information", informationRoutes);
 
 module.exports = app;

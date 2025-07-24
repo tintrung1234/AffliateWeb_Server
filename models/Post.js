@@ -10,6 +10,11 @@ const postSchema = new mongoose.Schema({
   imageUrl: { type: String, default: "" },
   createdAt: { type: Date, default: Date.now },
   imagePublicId: { type: String},
+  
+  // SEO Fields
+  metaTitle: { type: String, default: "" },
+  metaDescription: { type: String, default: "" },
+  metaKeywords: { type: String, default: "" },
 });
 
 // Optional: enable full-text search
