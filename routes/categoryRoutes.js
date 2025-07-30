@@ -6,10 +6,13 @@ const {
   updateCategory,
   deleteCategory,
   createCategory,
+  getCategoryDetail
 } = require("../controllers/categoryController");
 
 // Lấy tất cả bài viết
 router.get("/", getAllCategories);
+
+router.get("/detail/:id", getCategoryDetail);
 
 router.post("/create", createCategory);
 

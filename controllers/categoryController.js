@@ -56,6 +56,19 @@ const createCategory = async (req, res) => {
   }
 };
 
+const getCategoryDetail = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const category = await Categories.findById(id);
+    if (!category) {
+      return res.status(404).json({ message: "Danh mục không tồn tại" });
+    }
+    res.json(category);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi khi lấy chi tiết danh mục", error });
+  }
+};
+
 const deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -76,5 +89,6 @@ module.exports = {
   getAllCategories,
   updateCategory,
   createCategory,
-  deleteCategory
+  deleteCategory,
+  getCategoryDetail
 };
