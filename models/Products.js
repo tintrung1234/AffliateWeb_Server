@@ -1,3 +1,4 @@
+const { string } = require("i/lib/util");
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
@@ -8,10 +9,11 @@ const productSchema = new mongoose.Schema({
   discount: { type: Number },
   views: { type: Number },
   rating: { type: Number },
+  URL: { type: String },
   category: { type: String, required: true },
   imageUrl: { type: String, default: "" },
   createdAt: { type: Date, default: Date.now },
-  imagePublicId: { type: String},
+  imagePublicId: { type: String },
 });
 
 // Optional: enable full-text search

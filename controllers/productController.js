@@ -64,7 +64,7 @@ const getProductsByCategory = async (req, res) => {
 
 const createProduct = async (req, res) => {
     try {
-        const { uid, title, price, description, discount, views, rating, category } = req.body;
+        const { uid, title, price, description, discount, URL, views, rating, category } = req.body;
 
         // Kiểm tra các trường bắt buộc
         if (!title || !description || !category) {
@@ -99,6 +99,7 @@ const createProduct = async (req, res) => {
             views: typeof views === "number" ? views : 0,
             rating: typeof rating === "number" ? rating : 0,
             category,
+            URL,
             imageUrl,
             imagePublicId,
             createdAt: new Date(),
@@ -120,58 +121,60 @@ const createProduct = async (req, res) => {
 };
 
 const updateProduct = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const {
-      category,
-      title,
-      description,
-      discount,
-      views,
-      rating,
-      price
-    } = req.body;
+    try {
+        const { id } = req.params;
+        const {
+            category,
+            title,
+            description,
+            discount,
+            views,
+            URL,
+            rating,
+            price
+        } = req.body;
 
-    const product = await Product.findById(id);
-    if (!product) return res.status(404).json({ message: "Product not found" });
+        const product = await Product.findById(id);
+        if (!product) return res.status(404).json({ message: "Product not found" });
 
-    // Xoá ảnh cũ nếu có
-    if (product.imagePublicId) {
-      await cloudinary.uploader.destroy(product.imagePublicId);
+        // Xoá ảnh cũ nếu có
+        if (product.imagePublicId) {
+            await cloudinary.uploader.destroy(product.imagePublicId);
+        }
+
+        // Upload ảnh mới nếu có
+        if (req.file) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: "products",
+            });
+            product.imageUrl = result.secure_url;
+            product.imagePublicId = result.public_id;
+
+            const fs = require("fs");
+            try {
+                fs.unlinkSync(req.file.path);
+            } catch (err) {
+                console.error("Failed to delete temp file:", err);
+            }
+        }
+
+        // Cập nhật các trường
+        product.category = category || product.category;
+        product.title = title || product.title;
+        product.price = price !== undefined ? Number(price) : product.price;
+        product.description = description || product.description;
+        product.discount = discount !== undefined ? Number(discount) : product.discount;
+        product.views = views !== undefined ? Number(views) : product.views;
+        product.URL = URL !== undefined ? Number(URL) : product.URL;
+        product.rating = rating !== undefined ? Number(rating) : product.rating;
+
+        await product.save();
+
+        res.json({ message: "Product updated successfully", product });
+    } catch (err) {
+        console.error("Update error:", err);
+        res.status(500).json({ message: "Error updating product", error: err.message });
     }
-
-    // Upload ảnh mới nếu có
-    if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "products",
-      });
-      product.imageUrl = result.secure_url;
-      product.imagePublicId = result.public_id;
-
-      const fs = require("fs");
-      try {
-        fs.unlinkSync(req.file.path);
-      } catch (err) {
-        console.error("Failed to delete temp file:", err);
-      }
-    }
-
-    // Cập nhật các trường
-    product.category = category || product.category;
-    product.title = title || product.title;
-    product.price = price !== undefined ? Number(price) : product.price;
-    product.description = description || product.description;
-    product.discount = discount !== undefined ? Number(discount) : product.discount;
-    product.views = views !== undefined ? Number(views) : product.views;
-    product.rating = rating !== undefined ? Number(rating) : product.rating;
-
-    await product.save();
-
-    res.json({ message: "Product updated successfully", product });
-  } catch (err) {
-    console.error("Update error:", err);
-    res.status(500).json({ message: "Error updating product", error: err.message });
-  }
 };
 
 const deleteProduct = async (req, res) => {
