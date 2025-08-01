@@ -15,6 +15,7 @@ const postSchema = new mongoose.Schema({
   metaTitle: { type: String, default: "" },
   metaDescription: { type: String, default: "" },
   metaKeywords: { type: String, default: "" },
+  metaURL: { type: String, default: "" },
 });
 
 // Optional: enable full-text search
