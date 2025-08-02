@@ -64,7 +64,8 @@ const getPostsByCategory = async (req, res) => {
 const getPostDetail = async (req, res) => {
   const { slug } = req.params;
   try {
-    const post = await Post.findOne(slug);
+    const post = await Post.findOne({ slug });
+
     if (!post) {
       return res.status(404).json({ message: "Bài viết không tồn tại" });
     }
@@ -134,7 +135,6 @@ const createPost = async (req, res) => {
     res
       .status(201)
       .json({ message: "Post created successfully", post: savedPost });
-    console.log("Post created successfully:", savedPost);
   } catch (err) {
     console.error(err);
     res
@@ -146,10 +146,10 @@ const createPost = async (req, res) => {
 
 const updatePost = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { Slug } = req.params;
     const { category, title, description, views, content, metaTitle, metaDescription, metaKeywords, metaURL, slug } = req.body;
 
-    const post = await Post.findById(id);
+    const post = await Post.findOne({ Slug });
     if (!post) return res.status(404).json({ message: "Post not found" });
 
     // // Kiểm tra quyền sở hữu

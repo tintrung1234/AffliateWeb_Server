@@ -37,7 +37,7 @@ router.get("/search", searchPosts);
 router.get("/category/:category", getPostsByCategory);
 
 // Lấy bài viết chi tiết
-router.get("/detail/:id", getPostDetail);
+router.get("/detail/:slug", getPostDetail);
 
 // Lấy bài viết mới nhất
 router.get("/newest", getPostsNewest);
