@@ -157,20 +157,19 @@ const updatePost = async (req, res) => {
     //   return res.status(403).json({ message: "Unauthorized" });
     // }
 
-    //Xoa anh 
-    if (post.imagePublicId) {
-      await cloudinary.uploader.destroy(post.imagePublicId);
-    }
-
-    // Upload ảnh mới nếu có
+    // Nếu có ảnh mới thì xóa ảnh cũ và upload ảnh mới
     if (req.file) {
+      if (post.imagePublicId) {
+        await cloudinary.uploader.destroy(post.imagePublicId);
+      }
+
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "posts",
       });
       post.imageUrl = result.secure_url;
       post.imagePublicId = result.public_id;
-      // Xoá file tạm
-      fs.unlinkSync(req.file.path);
+
+      fs.unlinkSync(req.file.path); // Xoá file tạm
     }
 
     // Cập nhật các trường còn lại
