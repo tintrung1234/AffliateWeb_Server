@@ -62,9 +62,9 @@ const getPostsByCategory = async (req, res) => {
 };
 
 const getPostDetail = async (req, res) => {
-  const { id } = req.params;
+  const { slug } = req.params;
   try {
-    const post = await Post.findById(id);
+    const post = await Post.findOne(slug);
     if (!post) {
       return res.status(404).json({ message: "Bài viết không tồn tại" });
     }
@@ -90,7 +90,7 @@ const getPostsNewest = async (req, res) => {
 
 const createPost = async (req, res) => {
   try {
-    const { uid, title, description, views, category, content } = req.body;
+    const { uid, title, description, views, category, content, slug } = req.body;
 
     // Kiểm tra các trường bắt buộc
     if (!title || !description || !category) {
@@ -125,6 +125,7 @@ const createPost = async (req, res) => {
       content,
       imageUrl,
       imagePublicId,
+      slug,
       createdAt: new Date(),
     });
 
@@ -146,7 +147,7 @@ const createPost = async (req, res) => {
 const updatePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const { category, title, description, views, content, metaTitle, metaDescription, metaKeywords, metaURL } = req.body;
+    const { category, title, description, views, content, metaTitle, metaDescription, metaKeywords, metaURL, slug } = req.body;
 
     const post = await Post.findById(id);
     if (!post) return res.status(404).json({ message: "Post not found" });
@@ -178,6 +179,7 @@ const updatePost = async (req, res) => {
     post.description = description || post.description;
     post.content = content || post.content;
     post.views = views !== undefined ? Number(views) : post.views;
+    post.slug = slug !== undefined ? String(slug) : post.slug;
     post.metaTitle = metaTitle !== undefined ? String(metaTitle) : post.metaTitle;
     post.metaDescription = metaDescription !== undefined ? String(metaDescription) : post.metaDescription;
     post.metaKeywords = metaKeywords !== undefined ? String(metaKeywords) : post.metaKeywords;

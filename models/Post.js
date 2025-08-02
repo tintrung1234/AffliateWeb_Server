@@ -9,8 +9,9 @@ const postSchema = new mongoose.Schema({
   content: { type: String },
   imageUrl: { type: String, default: "" },
   createdAt: { type: Date, default: Date.now },
-  imagePublicId: { type: String},
-  
+  slug: { type: String, default: ""  },
+  imagePublicId: { type: String },
+
   // SEO Fields
   metaTitle: { type: String, default: "" },
   metaDescription: { type: String, default: "" },
