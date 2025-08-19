@@ -8,6 +8,7 @@ const productRoutes = require("./routes/productRoutes");
 const bannerRoutes = require("./routes/bannerRoutes");
 const informationRoutes = require("./routes/informationRoutes");
 const assetsRoutes = require("./routes/assetsRoutes")
+const adminRoutes = require("./routes/adminDasboardRoutes")
 
 const app = express();
 app.use(cors());
@@ -21,5 +22,6 @@ app.use("/api/products", productRoutes);
 app.use("/api/banner", bannerRoutes);
 app.use("/api/assets", assetsRoutes);
 app.use("/api/information", informationRoutes);
+app.use("/api/admin-dasboard", adminRoutes);
 
 module.exports = app;

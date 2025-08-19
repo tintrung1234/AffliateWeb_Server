@@ -116,6 +116,9 @@ const createPost = async (req, res) => {
       fs.unlinkSync(req.file.path);
     }
 
+    // Ngày hôm nay (cho viewsPerDay)
+    const today = new Date().toISOString().slice(0, 10);
+
     // Tạo post mới
     const newPost = new Post({
       uid,
@@ -126,6 +129,7 @@ const createPost = async (req, res) => {
       content,
       imageUrl,
       imagePublicId,
+      viewsPerDay: [{ date: today, count: 0 }],
       slug,
       createdAt: new Date(),
     });
@@ -221,6 +225,37 @@ const getTop1Blog = async (req, res) => {
   }
 };
 
+const increaseView = async (req, res) => {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+
+    const post = await Post.findOne({ slug: req.params.slug });
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    // tăng tổng views
+    post.views += 1;
+
+    // tìm index của ngày hôm nay
+    const index = post.viewsPerDay.findIndex(v => v.date === today);
+
+    if (index !== -1) {
+      // đã có -> tăng count
+      post.viewsPerDay[index].count += 1;
+    } else {
+      // chưa có -> push mới
+      post.viewsPerDay.push({ date: today, count: 1 });
+    }
+
+    await post.save();
+
+    res.json(post);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+
 module.exports = {
   getAllPosts,
   searchPosts,
@@ -230,5 +265,6 @@ module.exports = {
   createPost,
   updatePost,
   deletePost,
-  getTop1Blog
+  getTop1Blog,
+  increaseView
 };

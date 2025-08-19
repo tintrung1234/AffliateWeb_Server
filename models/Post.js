@@ -6,10 +6,16 @@ const postSchema = new mongoose.Schema({
   description: { type: String, required: true },
   category: { type: String, required: true },
   views: { type: Number },
+  viewsPerDay: [
+    {
+      date: { type: Date, required: true },
+      count: { type: Number, default: 0 }
+    }
+  ],
   content: { type: String },
   imageUrl: { type: String, default: "" },
   createdAt: { type: Date, default: Date.now },
-  slug: { type: String, default: ""  },
+  slug: { type: String, default: "" },
   imagePublicId: { type: String },
 
   // SEO Fields

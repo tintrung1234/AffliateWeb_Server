@@ -24,7 +24,8 @@ const {
   createPost,
   updatePost,
   deletePost,
-  getTop1Blog
+  getTop1Blog,
+  increaseView
 } = require("../controllers/postController");
 
 // Lấy tất cả bài viết
@@ -65,5 +66,7 @@ router.put(
   },
   updatePost
 );
+
+router.put("/increase-views/:slug", increaseView);
 
 module.exports = router;
